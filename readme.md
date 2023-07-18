@@ -3,9 +3,11 @@
 
 ## Installation
 
-1. Download this repository to /wp-content/plugins
-2. Search and replace CRMNAME to the CRM in proper name, and crmname to the name in lowercase.
-3. Edit the class included in includes/class-crm-base.php to connect to the CRM.
+1. Make an installation of WordPress
+2. Download the base plugin FormsCRM from WordPress repository: https://wordpress.org/plugins/formscrm/
+3. Download this repository to /wp-content/plugins
+4. Search and replace CRMNAME to the CRM in proper name, and crmname to the name in lowercase.
+5. Edit the class included in includes/class-crm-base.php to connect to the CRM.
 
 ## Explain Methods of class
 
