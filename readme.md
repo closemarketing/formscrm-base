@@ -9,7 +9,7 @@
 
 ## Explain Methods of class
 
-In the CRM Class there are four methods to connect to the CRM:
+In the CRM Class there are four methods to connect to the CRM. You will find it in includes/class-crm-crmname.php
 
 ### API
 

@@ -53,7 +53,7 @@ add_filter(
 	function( $choices ) {
 		// Add a new option to the styles array.
 
-		$choices['crmname'] = plugin_dir_path( __FILE__ ) . 'includes/class-crm-crmname.php';
+		$choices['crmname'] = plugin_dir_path( __FILE__ ) . 'includes/class-crmlib-crmname.php';
 
 		// Return the array of paths.
 		return $choices;
