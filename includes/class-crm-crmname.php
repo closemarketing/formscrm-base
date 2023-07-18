@@ -1,6 +1,6 @@
 <?php
 /**
- * Clientify connect library
+ * CRMNAME connect library
  *
  * Has functions to login, list fields and create leadº
  *
@@ -13,48 +13,24 @@
 /**
  * Class for Holded connection.
  */
-class CRMLIB_Clientify {
+class CRMLIB_CRMNAME {
 	/**
 	 * Gets information from Holded CRM
 	 *
 	 * @param string $url URL for module.
 	 * @return array
 	 */
-	private function get( $url, $apikey ) {
+	private function api( $method, $url, $apikey ) {
 		$args     = array(
+			'method'  => $method, // 'GET', 'POST', 'PUT', 'DELETE
 			'headers' => array(
 				'Authorization' => 'Token ' . $apikey,
 			),
 			'timeout' => 120,
 		);
-		$url      = '' . $url;
-		$response = wp_remote_get( $url, $args );
+		$url      = 'https://api.domain.com/' . $url;
+		$response = wp_remote_request( $url, $args );
 
-		if ( is_wp_error( $response ) ) {
-			formscrm_error_admin_message( 'ERROR', $response->errors['http_request_failed'][0] );
-			return false;
-		} else {
-			$body = wp_remote_retrieve_body( $response );
-
-			return json_decode( $body, true );
-		}
-	}
-	/**
-	 * Posts information from Holded CRM
-	 *
-	 * @param string $url URL for module.
-	 * @return array
-	 */
-	private function post( $url, $bodypost, $apikey ) {
-		$args     = array(
-			'headers' => array(
-				'Authorization' => 'Token ' . $apikey,
-				'Content-Type'  => 'application/json',
-			),
-			'timeout' => 120,
-			'body'    => wp_json_encode( $bodypost ),
-		);
-		$response = wp_remote_post( 'https://api.clientify.net/v1/' . $url, $args );
 		if ( is_wp_error( $response ) ) {
 			formscrm_error_admin_message( 'ERROR', $response->errors['http_request_failed'][0] );
 			return false;
@@ -72,8 +48,8 @@ class CRMLIB_Clientify {
 	 * @return false or id     returns false if cannot login and string if gets token
 	 */
 	public function login( $settings ) {
-		$apikey = isset( $settings['fc_crm_apipassword'] ) ? $settings['fc_crm_apipassword'] : '';
-		$get_result = $this->get( 'settings/my-account/', $apikey );
+		$apikey     = isset( $settings['fc_crm_apipassword'] ) ? $settings['fc_crm_apipassword'] : '';
+		$get_result = $this->api( 'GET', 'settings/my-account/', $apikey );
 
 		if ( $apikey && isset( $get_result['count'] ) && $get_result['count'] > 0 ) {
 			return true;
@@ -92,11 +68,13 @@ class CRMLIB_Clientify {
 		$modules = array(
 			array(
 				'name'  => 'contacts',
-				'label' => __( 'Contacts', 'formscrm-clientify' ),
+				'value' => 'contacts',
+				'label' => __( 'Contacts', 'formscrm-crmname' ),
 			),
 			array(
 				'name'  => 'companies',
-				'label' => __( 'Companies', 'formscrm-clientify' ),
+				'value' => 'companies',
+				'label' => __( 'Companies', 'formscrm-crmname' ),
 			),
 		);
 		return $modules;
@@ -112,10 +90,14 @@ class CRMLIB_Clientify {
 		$apikey = isset( $settings['fc_crm_apipassword'] ) ? $settings['fc_crm_apipassword'] : '';
 		$module = formscrm_get_module( 'contacts' );
 
-		formscrm_debug_message( __( 'Module active:', 'formscrm-clientify' ) . $module );
+		formscrm_debug_message( __( 'Module active:', 'formscrm-crmname' ) . $module );
 		$fields = array();
 		if ( 'contacts' === $module ) {
-			$fields[] = array( 'name' => 'owner', 'label' => __( 'username of the owner of the contact', 'formscrm-clientify' ), 'required' => false , );
+			$fields[] = array(
+				'name'     => 'owner',
+				'label'    => __( 'username of the owner of the contact', 'formscrm-crmname' ),
+				'required' => false,
+			);
 		}
 		return $fields;
 	}
@@ -140,13 +122,13 @@ class CRMLIB_Clientify {
 				$contact[ $element['name'] ] = $element['value'];
 			}
 		}
-		$result = $this->post( $module, $contact, $apikey );
+		$result = $this->api( 'POST', $module, $contact, $apikey );
 
 		if ( isset( $result['id'] ) ) {
 			return $result['id'];
 		} else {
 			$message = isset( $result['detail'] ) ? $result['detail'] : '';
-			formscrm_debug_email_lead( 'Clientify', 'Error ' . $message, $merge_vars );
+			formscrm_debug_email_lead( 'CRMNAME', 'Error ' . $message, $merge_vars );
 		}
 	}
 
